@@ -209,11 +209,19 @@ window.mxMiete=miete;window.mxNummer=nummer;
 function nachricht(m){
   const c=D.cars[st.car],von=st.datum,bis=st.bis;
   const rest=m-st.betrag;
+  const liste=c.gp*scaler(wtIndex(von),st.dauer);
+  const proz=liste>0?Math.round((1-m/liste)*100):0;
   const z=[];
   z.push("Fahrzeug: "+c.n);
   z.push("Zeitraum: "+wtKurz(von)+" "+kurz(von)+" bis "+wtKurz(bis)+" "+lang(bis)
          +", "+st.dauer+(st.dauer===1?" Tag":" Tage"));
   z.push("");
+  if(proz>0){
+    z.push("*Ihr Rabatt: "+proz+" %*");
+    z.push("Statt "+EUR.format(liste)+" nur "+EUR.format(m));
+    z.push("Sie sparen "+EUR.format(liste-m));
+    z.push("");
+  }
   z.push("Mietpreis: "+EUR.format(m));
   z.push("Anzahlung: "+EUR.format(st.betrag));
   z.push(rest>0.005 ? "Rest bei Abholung: "+EUR.format(rest)
