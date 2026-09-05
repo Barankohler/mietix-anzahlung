@@ -224,10 +224,14 @@ function nachricht(m){
   const rest=m-st.betrag;
   const liste=grundmiete(st.car,wtIndex(von),st.dauer);
   const proz=liste>0?Math.round((1-m/liste)*100):0;
+  const zeitraum = wtKurz(von)+" "+kurz(von)+" bis "+wtKurz(bis)+" "+lang(bis)
+                 +", "+st.dauer+(st.dauer===1?" Tag":" Tage");
   const z=[];
-  z.push("Fahrzeug: "+c.n);
-  z.push("Zeitraum: "+wtKurz(von)+" "+kurz(von)+" bis "+wtKurz(bis)+" "+lang(bis)
-         +", "+st.dauer+(st.dauer===1?" Tag":" Tage"));
+  z.push("*Ihre Reservierung*");
+  z.push("");
+  z.push("- Fahrzeug: "+c.n);
+  z.push("- Zeitraum: "+zeitraum);
+  if(c.kaution)z.push("- Kaution bei Abholung: "+EUR0.format(c.kaution)+", kommt nach Rückgabe komplett zurück");
   z.push("");
   if(proz>0){
     z.push("*Ihr Rabatt: "+proz+" %*");
@@ -235,15 +239,15 @@ function nachricht(m){
     z.push("Sie sparen "+EUR.format(liste-m));
     z.push("");
   }
-  z.push("Mietpreis: "+EUR.format(m));
-  z.push("Anzahlung: "+EUR.format(st.betrag));
-  z.push(rest>0.005 ? "Rest bei Abholung: "+EUR.format(rest)
-                    : "Damit ist die Miete vollständig bezahlt.");
-  if(c.kaution)z.push("Kaution bei Abholung: "+EUR0.format(c.kaution)+", kommt nach Rückgabe komplett zurück");
+  z.push("*Zahlung*");
+  z.push("");
+  z.push("- Mietpreis: "+EUR.format(m));
+  z.push("- Anzahlung jetzt: "+EUR.format(st.betrag));
+  z.push(rest>0.005 ? "- Rest bei Abholung: "+EUR.format(rest)
+                    : "- Damit ist die Miete vollständig bezahlt.");
   z.push("");
   if(st.dauer>1){
-    z.push("Dieser Preis gilt nur für den kompletten Zeitraum "
-      +wtKurz(von)+" "+kurz(von)+" bis "+wtKurz(bis)+" "+lang(bis)
+    z.push("Gilt nur für den kompletten Zeitraum "+zeitraum
       +" am Stück. Für einzelne Tage daraus gilt der reguläre Tagespreis.");
     z.push("");
   }
