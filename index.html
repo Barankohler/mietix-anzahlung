@@ -192,9 +192,22 @@ function tageZwischen(v,b){return Math.round((b-v)/86400000);}
 
 function scaler(s,d){const W=D.faktor.reduce((a,b)=>a+b,0);let sum=Math.floor(d/7)*W;
   for(let k=0;k<d%7;k++)sum+=D.faktor[(s+k)%7];return sum;}
+
+/* Wochenendpreis ist die Obergrenze: faellt ein Miettag auf Fr, Sa oder So,
+   kostet dieser Tag hoechstens den Wochenendpreis des Fahrzeugs. Die
+   Ein-Tages-Miete am Wochenende behaelt ihren eigenen Sonderpreis. */
+function tagespreis(a,wt){
+  const f=a.gp*D.faktor[wt];
+  return (wt>=4 && a.frSa>0) ? Math.min(f,a.frSa) : f;
+}
+function wochenmiete(a,start,dauer){
+  if(dauer===1 && start>=4) return a.frSa || a.gp*D.faktor[start];
+  let s=0;
+  for(let k=0;k<dauer;k++) s+=tagespreis(a,(start+k)%7);
+  return s;
+}
 function grundmiete(car,day,dauer){
-  const c=D.cars[car];
-  return (dauer===1&&day>=4)?(c.frSa||c.gp*1.35):c.gp*scaler(day,dauer);
+  return wochenmiete(D.cars[car],day,dauer);
 }
 function miete(car,day,dauer){
   if(dauer<D.mind[day])return null;
@@ -232,6 +245,12 @@ function nachricht(m){
                     : "Damit ist die Miete vollständig bezahlt.");
   if(c.kaution)z.push("Kaution bei Abholung: "+EUR0.format(c.kaution)+", kommt nach Rückgabe komplett zurück");
   z.push("");
+  if(st.dauer>1){
+    z.push("Dieser Preis gilt nur für den kompletten Zeitraum "
+      +wtKurz(von)+" "+kurz(von)+" bis "+wtKurz(bis)+" "+lang(bis)
+      +" am Stück. Für einzelne Tage daraus gilt der reguläre Tagespreis.");
+    z.push("");
+  }
   z.push("Sobald die Anzahlung eingegangen ist, ist das Fahrzeug für Sie reserviert.");
   z.push("");
   z.push("Soll ich Ihnen die Zahlungsdaten schicken?");
